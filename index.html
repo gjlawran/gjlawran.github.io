@@ -12,6 +12,9 @@
         <!-- DataTables -->
         <script src="https://cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
         <link rel="stylesheet" href="https://cdn.datatables.net/1.10.5/css/jquery.dataTables.min.css">
+        <!-- Leaflet -->
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>
@@ -76,8 +79,13 @@
             
               });
         </script>
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+     <style>
+       #map-mapquest { height: 300px }
+       #map-container { height: 300px }
+       #map-leaflet { height: 300px }
+       #map-openlayers3 { height: 300px }
+     </style>
+ 
     </head>
     <body>
         <ul class="nav nav-tabs">
