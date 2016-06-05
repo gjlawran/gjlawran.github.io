@@ -37,13 +37,13 @@
                 else{
                     $.getJSON( "http://catalogue.data.gov.bc.ca/api/action/datastore_search?resource_id=b12cd4cc-b58b-4079-b630-a20b6df58e8d&limit=500&q="+searchString, function( data ) {
                       console.log(data.result.records[1]);
-                      console.log(data.result.records[1].PRODUCT_LONG_NAME);
+                      console.log(data.result.records[1].PROJECT_NAME);
                         // create a blank array
                         var items = [];
             
                         // go through the records from the response and push them into the array as an HTML list
                         $.each( data.result.records, function( key, val ) {
-                            items.push( "<li id='" + key + "'>" + val.PRODUCT_LONG_NAME + " $" + val.CURRENT_DISPLAY_PRICE + "</li>" );
+                            items.push( "<li id='" + key + "'>" + val.PROJECT_NAME + " $" + val.PROJECT_TYPE + "</li>" );
                           });
                       /* write the array to the results div
                       /* $('#results').html(items);
@@ -52,9 +52,9 @@
                         $('#example').dataTable( {
                        data:data.result.records,
                        columns:[
-                       {data: 'PRODUCT_CLASS_NAME'},
-                       {data: 'PRODUCT_LONG_NAME'},
-                       {data: 'CURRENT_DISPLAY_PRICE'}
+                       {data: 'PROJECT_NAME'},
+                       {data: 'PROJECT_TYPE'},
+                       {data: 'PROJECT_PROPONENT'}
             
             
                        ]
@@ -115,16 +115,16 @@
                 <table class="table table-striped" id="example">
                     <thead>
                         <tr>
-                            <th>Type</th>
                             <th>Name</th>
-                            <th>Price</th>
+                            <th>Type</th>
+                            <th>Proponent</th>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
-                            <th>PRODUCT_CLASS_NAME</th>
-                            <th>PRODUCT_LONG_NAME</th>
-                            <th>CURRENT_DISPLAY_PRICE</th>
+                            <th>PROJECT_NAME</th>
+                            <th>PROJECT_TYPE</th>
+                            <th>PROJECT_PROPONENT</th>
                         </tr>
                     </tfoot>
                     </tbody>
@@ -137,7 +137,7 @@
                 <script type="text/javascript" src="scripts/leafletAPI.js"></script>
             </div>
             <footer>
-                <p><a href=http://catalogue.data.gov.bc.ca/dataset/bc-liquor-store-product-price-list-current-prices/>Dataset Used</a>
+                <p><a href=https://catalogue.data.gov.bc.ca/dataset/natural-resource-sector-major-projects-points/resource/b12cd4cc-b58b-4079-b630-a20b6df58e8d>Dataset Used</a>
                 </p>
             </footer>
         </div>
