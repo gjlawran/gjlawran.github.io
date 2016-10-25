@@ -35,7 +35,7 @@
                     $('#results').html("<h2>Please enter a search term.</h2>");
                 }
                 else{
-                    $.getJSON( "http://catalogue.data.gov.bc.ca/api/action/datastore_search?resource_id=b12cd4cc-b58b-4079-b630-a20b6df58e8d&limit=500&q="+searchString, function( data ) {
+                    $.getJSON( "https://catalogue.data.gov.bc.ca/api/action/datastore_search?resource_id=b12cd4cc-b58b-4079-b630-a20b6df58e8d&limit=500&q="+searchString, function( data ) {
                       console.log(data.result.records[0]);
                       console.log(data.result.records[0].PROJECT_NAME);
                         // create a blank array
