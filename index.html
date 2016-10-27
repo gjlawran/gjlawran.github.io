@@ -1,135 +1,196 @@
 <html>
-    <head>
-        <link rel="shortcut icon" href="favicon.ico" >
-        <!-- Bootstrap -->
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-        <!-- Optional theme -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
-        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-        <!-- DataTables -->
-        <script src="https://cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.5/css/jquery.dataTables.min.css">
-        <!-- Leaflet -->
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
+
+<head>
+
+    <!-- Bootstrap -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <!-- bootstrap Tables -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
+    <!-- Leaflet -->
+    <!-- Load Leaflet from CDN-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/leaflet/1.0.0-rc.1/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/leaflet/1.0.0-rc.1/leaflet-src.js"></script>
+    <!-- Load Esri Leaflet plugin from CDN -->
+    <script src="https://cdn.jsdelivr.net/leaflet.esri/2.0.0/esri-leaflet.js"></script>
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
             <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
-        <script type="text/javascript">
-            $(document).ready(function(){
-             
-             var callAPI = function () {
-            
+    <script type="text/javascript">
+        //DEFINE TABLE
+        var $table = $('#table');
+
+        $(document).ready(function() {
+
+            var callAPI = function() {
+
                 //get the searchString
                 var searchString = $('#term').val();
-            
+
                 // if it is blank let them know
-                if(searchString === ""){
+                if (searchString === "") {
                     $('#results').html("<h2>Please enter a search term.</h2>");
-                }
-                else{
-                    $.getJSON( "https://catalogue.data.gov.bc.ca/api/action/datastore_search?resource_id=b12cd4cc-b58b-4079-b630-a20b6df58e8d&limit=500&q="+searchString, function( data ) {
-                      console.log(data.result.records[0]);
-                      console.log(data.result.records[0].PROJECT_NAME);
+                } else {
+                    $.getJSON("https://catalogue.data.gov.bc.ca/api/action/datastore_search?resource_id=b12cd4cc-b58b-4079-b630-a20b6df58e8d&limit=500&q=" + searchString, function(data) {
+                        //    console.log(data.result.records[0]);
+
                         // create a blank array
+                        var tablearray = [];
                         var items = [];
-            
+
+                        markers.clearLayers();
+
                         // go through the records from the response and push them into the array as an HTML list
-                        $.each( data.result.records, function( key, val ) {
-                            items.push( "<li id='" + key + "'>" + val.PROJECT_NAME + " $" + val.PROJECT_TYPE + "</li>" );
-                          });
-                      /* write the array to the results div
-                      /* $('#results').html(items);
-            
-                      /* write the table now*/
-                        $('#example').dataTable( {
-                       data:data.result.records,
-                       columns:[
-                       {data: 'PROJECT_NAME'},
-                       {data: 'PROJECT_TYPE'},
-                       {data: 'PROPONENT'}
-            
-            
-                       ]
-                        } );
-            
-            /* ********************************************** */
-                      });
+                        $.each(data.result.records, function(key, val) {
+                            tablearray.push(val);
+                            //console.log('what', val);
+                            items.push("<li id='" + key + "'>" + val.PROJECT_NAME + " $" + val.PROJECT_TYPE + "</li>");
+
+                            if (!val.LATITUDE || !val.LONGITUDE) return;
+                            var popupContent = '<div><b>' + val.PROJECT_NAME + '</b></div>' +
+                                '<div>' + val.FLNRO_REGION_NAME + '</div>' +
+                                '<div>' + val.PROJECT_DESCRIPTION + '</div>';
+
+                            L.marker([val.LATITUDE, val.LONGITUDE])
+                                .bindPopup(popupContent)
+                                .addTo(markers);
+                        });
+
+                        //TODO
+                        //calling popupContent to open - not currently implmented
+                        function markerFunction(id) {
+                            for (var i in markers) {
+                                var markerID = markers[i].options.title;
+                                if (markerID == id) {
+                                    markers[i].openPopup();
+                                };
+                            }
+                        }
+
+
+
+                        $(function() {
+                            $('#table').bootstrapTable({
+                                data: tablearray
+                            });
+
+                            $('#table').bootstrapTable('load', tablearray);
+
+                            $('#table').on('click-row.bs.table', function($element, $tr) {
+
+                                map.panTo([$tr.LATITUDE, $tr.LONGITUDE]);
+                                //TODO
+                                //IMPLEMENT OPEN popupContent on click-row
+                                //http://jsfiddle.net/abenrob/ZkC5M/
+                                //console.log($element.currentTarget, $tr.LATITUDE);
+                                //console.log($tr._id);
+                                //markers[60].openPopup();
+
+
+
+                            });
+
+
+                        });
+
+
+                    });
                 };
-            
-               }
-            
-            
+
+            }
+
             //if someone presses search
-              $('#search').click(callAPI);
-            
+            $('#search').click(callAPI);
+
             //if someone presses enter
-              $('#term').keyup(function(event){
-                   if(event.keyCode == 13){
-                       callAPI();
-                   }
-               });
-            
-            
-              });
-        </script>
-     <style>
-       #map-mapquest { height: 300px }
-       #map-container { height: 300px }
-       #map-leaflet { height: 300px }
-       #map-openlayers3 { height: 300px }
-     </style>
- 
-    </head>
-    <body>
-       
-        <div class="container">
-            <header>
-                 <h2>Datastore Demo with DataTable</h2>
+            $('#term').keyup(function(event) {
+                if (event.keyCode == 13) {
+                    callAPI();
+                }
+            });
 
-            </header>
-            <section id="fetch">
-                <input type="text" placeholder="enter a search" id="term" />
-                <button id="search">Search the datastore</button>
-                <HR>
-            </section>
-            <section id="results"></section>
-            <div class="col-md-6">
-                <table class="table table-striped" id="example">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Proponent</th>
-                        </tr>
-                    </thead>
-                    <tfoot>
-                        <tr>
-                            <th>PROJECT_NAME</th>
-                            <th>PROJECT_TYPE</th>
-                            <th>PROPONENT</th>
-                        </tr>
-                    </tfoot>
-                    </tbody>
-                </table>
-            </div>
-            <div class="container">
-                 <h5>map goes here</h5>
+        });
+    </script>
+    <style>
+        #map-leaflet {
+            height: 300px
+        }
+    </style>
 
-                <div id="map-leaflet" class="col-md-6"></div>
-                <script type="text/javascript" src="scripts/leafletAPI.js"></script>
-            </div>
-            <footer>
-                <p><a href=https://catalogue.data.gov.bc.ca/dataset/natural-resource-sector-major-projects-points/resource/b12cd4cc-b58b-4079-b630-a20b6df58e8d>Dataset Used</a>
-                </p>
-            </footer>
+</head>
+
+<body>
+    <ul class="nav nav-tabs">
+
+        <li role="presentation">
+            <a href="#">Table</a>
+        </li>
+        <li role="presentation">
+            <a href="#">Graph</a>
+        </li>
+        <li role="presentation">
+            <a href="#">Map</a>
+        </li>
+        <li role="presentation" class="active">
+            <a href="#">Table and Map</a>
+        </li>
+    </ul>
+    <div class="container">
+        <header>
+            <h2>Bootstrap Table and Leaflet Demo from DataStore</h2>
+
+        </header>
+        <section id="fetch">
+            <input type="text" placeholder="enter a search" id="term" />
+            <button id="search">Search the datastore</button>
+            <HR>
+        </section>
+        <section id="results"></section>
+        <div class="col-md-6">
+            <table class="table table-striped" id="table" data-sort-name="PROJECT_NAME">
+                <thead>
+                    <tr>
+                        <th sortable="true" , data-field="PROJECT_NAME">Name</th>
+                        <th data-field="PROJECT_TYPE">Type</th>
+                        <th data-field="PROPONENT">Proponent</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
-    </body>
+        <div class="container">
+            <h5>Leaflet Map with ArcGIS TileCache Layer</h5>
+
+            <div id="map-leaflet" class="col-md-6"></div>
+            <script type="text/javascript">
+                //define a map and associate it with a div container in this case map-leaflet
+                var map = L.map('map-leaflet').setView([52.362183, -125.994644], 5);
+                var markers = L.layerGroup()
+                map.addLayer(markers);
+
+                L.esri.tiledMapLayer({
+                    url: "https://maps.gov.bc.ca/arcgis/rest/services/province/roads_wm/MapServer"
+                }).addTo(map);
+            </script>
+        </div>
+        <footer>
+            <p><a href=https://catalogue.data.gov.bc.ca/dataset/natural-resource-sector-major-projects-points/resource/b12cd4cc-b58b-4079-b630-a20b6df58e8d>Dataset Used</a>
+            </p>
+        </footer>
+    </div>
+    <script>
+    </script>
+</body>
+
 </html>
