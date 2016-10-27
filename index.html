@@ -178,10 +178,12 @@
                 var map = L.map('map-leaflet').setView([52.362183, -125.994644], 5);
                 var markers = L.layerGroup()
                 map.addLayer(markers);
-
+                L.esri.basemapLayer("Topographic").addTo(map);
+                /* REMOVED DUE TO CORS ERROR
                 L.esri.tiledMapLayer({
                     url: "https://maps.gov.bc.ca/arcgis/rest/services/province/roads_wm/MapServer"
                 }).addTo(map);
+                */
             </script>
         </div>
         <footer>
